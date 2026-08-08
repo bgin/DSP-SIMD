@@ -22,7 +22,7 @@ For further details on usage, examples, and contributing, see the documentation 
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the terms of the GPLv3 license.
 
 ---
 *Created and maintained by [bgin](https://github.com/bgin)*
