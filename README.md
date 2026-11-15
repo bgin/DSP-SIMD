@@ -1,95 +1,35 @@
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+# DSP-SIMD
 
-**DSP-SIMD** is a high-performance, open-source C++ toolkit engineered for computationally intensive **Digital Signal Processing (DSP)** workloads. By leveraging hardware-level **SIMD (Single Instruction, Multiple Data)** vector instructions, this library accelerates core mathematical algorithms, transforming execution timelines from serial latency into parallel throughput. 
+C/C++ library containing explicitly vectorized Digital Signal Processing (DSP), complex arithmetic, linear algebra, and transcendental math primitives targeting x86/x86_64 SIMD instruction sets (SSE, AVX, AVX2, and AVX-512) [RF-EMT].
 
-The library is architected for developers building real-time audio processors, software-defined radio (SDR) pipelines, telecommunication stacks, and high-frequency sensor arrays where raw computational efficiency is a hard requirement.
+## Repository Structure
 
----
+* **`src/common/`** — Platform configuration, aligned memory allocation, SIMD helper macros, and low-level hardware PMC instrumentation (`GMS_config.h`, `GMS_malloc.h`, `GMS_fast_pmc_access.h`).
+* **`src/basic_functions/`** — Mixed-precision (FP32/FP64) AVX and AVX-512 (`zmm16r4`) element-wise vector operations.
+* **`src/complex_math/`** — Packed complex register wrappers (`xmm`, `ymm`, `zmm`), overflow-safe complex division using Smith’s algorithm (`GMS_cdiv_smith_vec_zmm16r4`), and complex hyperbolic sine routines (standard intrinsics and Intel SVML).
+* **`src/math_functions/`** — Vectorized special/transcendental functions, including modified Bessel functions of the first kind (`GMS_bessel_i0_sse.h`) and reference sine wave LUTs.
+* **`src/linalg/`** — Small-matrix linear algebra routines such as Cholesky matrix inversion (`GMS_matrix_inv_cholesky`).
+* **`unit-tests/` & `perf-tests/`** — Standalone drivers verifying SIMD outputs against reference implementations (covering both aligned and unaligned `_u` paths) alongside cycle-level benchmarks.
 
-## 🚀 Key Architectural Features
+## Requirements & Building
 
-*   **Hardware-Accelerated Vectorization:** Explicitly utilizes processor vector registers to compute multiple data points simultaneously, unlocking near-linear speedups on modern CPU architectures.
-*   **Modular DSP Primitives:** Highly decoupled, reusable components designed for seamless drop-in integration into complex DSP pipelines.
-*   **High-Performance Profiling:** Includes a robust integration test suite and benchmarking subsystem located under `perf-tests/` and `unit-tests/` to guarantee algorithmic precision and measure strict execution cycle optimizations.
-*   **Modern C++ Design:** Adheres to low-overhead design patterns, zero-cost abstractions, and strict cache-aligned memory management protocols.
-
----
-
-## 🛠 Supported SIMD Topologies
-
-The toolkit is designed to abstract platform-specific compiler intrinsics, providing cross-platform scalability across a variety of hardware vectors:
-*   **x86 / x86_64:** Intel & AMD hardware acceleration platforms including SSE4.2, AVX, AVX2, and AVX-512 extensions.
-
-
----
-
-## 📦 Core DSP Library Modules
-
-The codebase is systematically isolated into the following key execution modules:
-
-```text
-├── src/            # Core SIMD algorithm primitives and vectorized pipelines
-├── perf-tests/     # Low-level performance evaluation benchmarks and cycle tracking
-└── unit-tests/     # Strict logical correctness verification suites
-```
-
-### 1. Vectorized Arithmetic & Operations
-Optimized block memory arithmetic routines processing contiguous data arrays in single-cycle instruction bounds:
-*   Vector-Vector and Vector-Scalar Addition, Subtraction, Multiplication, and Division.
-*   Complex number multi-lane multiplication and fused-multiply-add (FMA) routines.
-
----
-
-## ⚙️ Getting Started
-
-### Prerequisites
-*   A modern C++ compiler supporting C++17 or higher (GCC, Clang, or MSVC).
-*   Hardware support for SIMD extensions (e.g., AVX2 or ARM NEON enabled via compiler flags like `-march=native`).
-
-### Cloning the Repository
-Retrieve the source codebase directly from GitHub:
+* **Requirements:** x86/x86_64 CPU with SSE/AVX/AVX-512 support; GCC, Clang, or Intel oneAPI (`icx`/`icpx`) supporting C11/C++17.
+* **Quick Build Examples:**
 
 ```bash
-git clone https://github.com/bgin/DSP-SIMD.git
+git clone https://github.com
 cd DSP-SIMD
+
+# Compile and run the SSE Bessel I0 unit test
+g++ -O3 -msse4.2 -std=c++17 -I./src unit-tests/unit_test_bessel_i0_sse.cpp -o unit_test_bessel_i0_sse
+./unit_test_bessel_i0_sse
+
+# Compile and run an AVX-512 vector addition test
+g++ -O3 -mavx512f -mavx512dq -std=c++17 -I./src src/basic_functions/GMS_add_vec_zmm16r4.cpp unit-tests/unit_test_add_vec_zmm16r4.cpp -o unit_test_add_vec_zmm16r4
+./unit_test_add_vec_zmm16r4
 ```
 
-### Compilation & Optimization Flags
-To harness the true performance of this toolkit, ensure target-specific optimization flags are provided to the compiler during compilation:
+## Origin and License
 
-```bash
-# Example compilation command enabling native vectorization instructions
-g++ -O3 -march=native -std=c++17 src/main.cpp -I ./src -o dsp_simd_app
-```
-
----
-
-## 🧪 Verification & Benchmarking
-
-The toolkit features dedicated sub-systems to verify numerical accuracy against standardized floating-point benchmarks, while simultaneously logging instruction performance.
-
-### Running Unit Tests
-To confirm cross-platform precision and edge-case correctness:
-```bash
-# Navigate to unit test directory and compile suite
-cd unit-tests
-# Execute unit testing pipeline
-```
-
-### Executing Performance Tests
-To run raw cycle benchmarks and compute throughput speedup analysis:
-```bash
-cd perf-tests
-# Execute performance binaries to monitor SIMD processing improvements
-```
-
----
-
-## 📄 Licensing & Contribution
-
-This toolkit is open-source and distributed under the terms of the **GNU General Public License v3 (GPLv3)**. 
-
-*   Feel free to file issues, feature requests, or submit optimization pull requests via the official [GitHub Repository](https://github.com/bgin/DSP-SIMD).
-*   *Created and actively maintained by bgin.*
+Extracted from the numerical backend of [RF-EMT](https://github.com) and distributed under the GNU General Public License v3.0.
 
