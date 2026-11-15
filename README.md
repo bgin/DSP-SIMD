@@ -28,6 +28,14 @@ g++ -O3 -msse4.2 -std=c++17 -I./src unit-tests/unit_test_bessel_i0_sse.cpp -o un
 g++ -O3 -mavx512f -mavx512dq -std=c++17 -I./src src/basic_functions/GMS_add_vec_zmm16r4.cpp unit-tests/unit_test_add_vec_zmm16r4.cpp -o unit_test_add_vec_zmm16r4
 ./unit_test_add_vec_zmm16r4
 ```
+```bash
+git clone https://github.com
+# CMake based compilation
+cd DSP-SIMD
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j
+ctest --test-dir build --output-on-failure
+```
 
 ## Origin and License
 
